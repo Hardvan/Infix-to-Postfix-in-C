@@ -48,6 +48,7 @@ int stackTop(struct stack *s)
     return s->items[s->top];
 }
 
+// Precedence Order for operators on stack
 int ISP(char opr)
 {
     switch (opr)
@@ -65,6 +66,7 @@ int ISP(char opr)
     }
 }
 
+// Precedence Order for current operator
 int ICP(char opr)
 {
     switch (opr)
@@ -84,30 +86,33 @@ int ICP(char opr)
 
 void InfixToPostfix(char infix[], char postfix[])
 {
-    int i = 0, j = 0;
+    int i = 0; // For infix iteration
+    int j = 0; // For postfix iteration
     char symb, topsymb;
 
-    struct stack s;
+    struct stack s; // Stack to store operators
     s.top = -1;
 
+    // Scanning Left to Right
     while (infix[i] != '\0')
     {
         symb = infix[i++];
 
-        if (isalpha(symb))
+        if (isalpha(symb)) // Operand (a, b, etc.)
         {
             postfix[j++] = symb;
         }
 
         else if (symb == '(')
         {
+            // Directly push
             push(&s, symb);
         }
 
         else if (symb == ')')
         {
+            // Pop everything till '('
             topsymb = pop(&s);
-
             while (topsymb != '(')
             {
                 postfix[j++] = topsymb;
@@ -115,8 +120,9 @@ void InfixToPostfix(char infix[], char postfix[])
             }
         }
 
-        else
+        else // Operator
         {
+            // Pop operators of higher precedence in stack than symb
             while (s.top != -1 && ISP(stackTop(&s)) > ICP(symb))
             {
                 topsymb = pop(&s);
@@ -126,12 +132,13 @@ void InfixToPostfix(char infix[], char postfix[])
         }
     }
 
+    // Pop remaining operators from stack and store in postfix
     while (s.top != -1)
     {
         topsymb = pop(&s);
         postfix[j++] = topsymb;
     }
-    postfix[j] = '\0';
+    postfix[j] = '\0'; // Add null literal
 }
 
 int main()
