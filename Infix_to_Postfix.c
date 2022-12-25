@@ -127,17 +127,24 @@ void InfixToPostfix(char infix[], char postfix[])
 
         else // Operator
         {
-            // Treat '(' as empty stack
-            if (!isEmpty(&s) && stackTop(&s) == '(')
+            while (!isEmpty(&s))
             {
-                push(&s, symb);
-                continue;
-            }
-            // Pop operators of higher precedence in stack than symb
-            while (!isEmpty(&s) && ISP(stackTop(&s)) > ICP(symb))
-            {
-                topsymb = pop(&s);
-                postfix[j++] = topsymb;
+                topsymb = stackTop(&s);
+
+                if (topsymb == '(')
+                {
+                    break;
+                }
+
+                if (ISP(topsymb) > ICP(symb))
+                {
+                    topsymb = pop(&s);
+                    postfix[j++] = topsymb;
+                }
+                else
+                {
+                    break;
+                }
             }
             push(&s, symb);
         }
