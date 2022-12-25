@@ -9,7 +9,7 @@ struct stack
     int top;
 };
 
-void push(struct stack *s, int x)
+void push(struct stack *s, char x)
 {
     if (s->top == STACKSIZE - 1)
     {
@@ -23,7 +23,7 @@ void push(struct stack *s, int x)
     return;
 }
 
-int pop(struct stack *s)
+char pop(struct stack *s)
 {
     if (s->top == -1)
     {
@@ -31,13 +31,13 @@ int pop(struct stack *s)
         return;
     }
 
-    int x = s->items[s->top];
+    char x = s->items[s->top];
     s->top--;
 
     return x;
 }
 
-int stackTop(struct stack *s)
+char stackTop(struct stack *s)
 {
     if (s->top == -1)
     {
@@ -46,6 +46,11 @@ int stackTop(struct stack *s)
     }
 
     return s->items[s->top];
+}
+
+int isEmpty(struct stack *s)
+{
+    return s->top == -1;
 }
 
 // Precedence Order for operators on stack
@@ -98,32 +103,38 @@ void InfixToPostfix(char infix[], char postfix[])
     {
         symb = infix[i++];
 
-        if (isalpha(symb)) // Operand (a, b, etc.)
+        if ((symb >= 'a' && symb <= 'z') ||
+            (symb >= 'A' && symb <= 'Z')) // Operand (a, b, etc.)
         {
             postfix[j++] = symb;
         }
 
         else if (symb == '(')
         {
-            // Directly push
-            push(&s, symb);
+            push(&s, symb); // Directly push
         }
 
         else if (symb == ')')
         {
             // Pop everything till '('
-            topsymb = pop(&s);
-            while (topsymb != '(')
+            while (!isEmpty(&s) && stackTop(&s) != '(')
             {
-                postfix[j++] = topsymb;
                 topsymb = pop(&s);
+                postfix[j++] = topsymb;
             }
+            pop(&s); // Pop '('
         }
 
         else // Operator
         {
+            // Treat '(' as empty stack
+            if (!isEmpty(&s) && stackTop(&s) == '(')
+            {
+                push(&s, symb);
+                continue;
+            }
             // Pop operators of higher precedence in stack than symb
-            while (s.top != -1 && ISP(stackTop(&s)) > ICP(symb))
+            while (!isEmpty(&s) && ISP(stackTop(&s)) > ICP(symb))
             {
                 topsymb = pop(&s);
                 postfix[j++] = topsymb;
@@ -133,7 +144,7 @@ void InfixToPostfix(char infix[], char postfix[])
     }
 
     // Pop remaining operators from stack and store in postfix
-    while (s.top != -1)
+    while (!isEmpty(&s))
     {
         topsymb = pop(&s);
         postfix[j++] = topsymb;
