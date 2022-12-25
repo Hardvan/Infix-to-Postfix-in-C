@@ -119,24 +119,17 @@ void InfixToPostfix(char infix[], char postfix[])
             // Pop everything till '('
             while (!isEmpty(&s) && stackTop(&s) != '(')
             {
-                // Pop and store in postfix
-                postfix[j++] = pop(&s);
+                postfix[j++] = pop(&s); // Pop and store in postfix
             }
             pop(&s); // Discard '('
         }
 
         else // Operator
         {
-            while (!isEmpty(&s))
+            while (!isEmpty(&s) && stackTop(&s) != '(') // '(' is treated as empty stack
             {
-                topsymb = stackTop(&s);
-
-                if (topsymb == '(')
-                    break;
-
-                if (ISP(topsymb) > ICP(symb))
+                if (ISP(stackTop(&s)) > ICP(symb))
                 {
-                    // Pop and store in postfix
                     postfix[j++] = pop(&s);
                 }
                 else
@@ -149,7 +142,6 @@ void InfixToPostfix(char infix[], char postfix[])
     // Pop remaining operators from stack and store in postfix
     while (!isEmpty(&s))
     {
-        // Pop and store in postfix
         postfix[j++] = pop(&s);
     }
     postfix[j] = '\0'; // Add null literal
