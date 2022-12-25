@@ -28,7 +28,7 @@ char pop(struct stack *s)
     if (s->top == -1)
     {
         printf("STACK UNDERFLOW\n");
-        return;
+        return '$';
     }
 
     char x = s->items[s->top];
@@ -42,7 +42,7 @@ char stackTop(struct stack *s)
     if (s->top == -1)
     {
         printf("STACK UNDERFLOW\n");
-        return;
+        return '$';
     }
 
     return s->items[s->top];
@@ -119,10 +119,10 @@ void InfixToPostfix(char infix[], char postfix[])
             // Pop everything till '('
             while (!isEmpty(&s) && stackTop(&s) != '(')
             {
-                topsymb = pop(&s);
-                postfix[j++] = topsymb;
+                // Pop and store in postfix
+                postfix[j++] = pop(&s);
             }
-            pop(&s); // Pop '('
+            pop(&s); // Discard '('
         }
 
         else // Operator
@@ -132,29 +132,25 @@ void InfixToPostfix(char infix[], char postfix[])
                 topsymb = stackTop(&s);
 
                 if (topsymb == '(')
-                {
                     break;
-                }
 
                 if (ISP(topsymb) > ICP(symb))
                 {
-                    topsymb = pop(&s);
-                    postfix[j++] = topsymb;
+                    // Pop and store in postfix
+                    postfix[j++] = pop(&s);
                 }
                 else
-                {
                     break;
-                }
             }
-            push(&s, symb);
+            push(&s, symb); // Push current operator on stack
         }
     }
 
     // Pop remaining operators from stack and store in postfix
     while (!isEmpty(&s))
     {
-        topsymb = pop(&s);
-        postfix[j++] = topsymb;
+        // Pop and store in postfix
+        postfix[j++] = pop(&s);
     }
     postfix[j] = '\0'; // Add null literal
 }
